@@ -1,0 +1,8 @@
+1.在windows的环境下自动使用gbk编码方式，但是现阶段THULAC只支持UTF-8编码，并且抓取的评论信息全部都是以UTF-8模式保存的。
+所以在THULAC的_init_文件下强制指定了编码方式为utf-8(encoding = "utf-8")
+
+2.THULAC训练模型位置C:\Users\Zhaoxin Wu\AppData\Local\Programs\Python\Python35\Lib\site-packages\thulac\models
+
+3.Pandas读取csv文件时可能会由于文件中存在\r导致错误，避免此错误可以通过申明error_bad_lines=false忽略出现异常的段
+
+4.
