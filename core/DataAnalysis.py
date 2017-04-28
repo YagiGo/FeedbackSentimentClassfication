@@ -50,14 +50,16 @@ print(numberOfReviewPerDate)
 '''
 
 def dataAnalysis(inPath, outPath):
-    countOfReviewWithNoContent = 0
-    countOfReviewWithContent = 0
+    numberOfReviewsWithContent = 0
+    numberOfReviewsWithoutContent = 0
     reviewUser = []
     reviewContent = []
     reviewDateAndTime = []
     reviewDate = []
     dateWithReviews = []
     numberOfReviewsOnSameDate = []
+    numberOfReviewsWithoutContentOnSameDate = []
+    numberOfReviewsWithContentOnSameDate = []
     noEmotionReview = []
     start = 0
     numberOfReviews = 0
@@ -65,10 +67,10 @@ def dataAnalysis(inPath, outPath):
     # df_names = pd.read_csv('C:\workspace\SentimentClassfication\input.csv',
     #                       error_bad_lines = False, header = None, names = ['name', 'date', 'content'])
     # 获取总行数
-    df = df.sort_values(by = [1], ascending = False)
+    df_sorted = df.sort_values(by = [1], ascending = False)
     #print(df)
-    #df.to_csv('C:\workspace\SentimentClassfication\SortTest.csv', index=False, header=False)
-
+    df_sorted.to_csv('C:\workspace\SentimentClassfication\SortTest.csv', index=False, header=False, encoding = 'utf-8')
+    df = pd.read_csv('C:\workspace\SentimentClassfication\SortTest.csv', error_bad_lines = False, header = None)
     for row in range(len(df.index)):
         reviewUser.append(df.ix[row][0])
         reviewDateAndTime.append(df.ix[row][1])
@@ -94,14 +96,39 @@ def dataAnalysis(inPath, outPath):
             dateWithReviews.append(reviewDate[item])
             numberOfReviews = 0
             item = start
-    numberOfReviewPerDate = list(zip(dateWithReviews, numberOfReviewsOnSameDate))
-    df_date = pd.DataFrame(data = numberOfReviewPerDate, columns = ['Date', 'NumberOfReviews'])
+    item = 0
+    while item < len(reviewDate) - 1:
+        if (reviewContent[item] == '此用户没有填写评论!') :
+            numberOfReviewsWithoutContent += 1
+        elif(reviewContent[item] != '此用户没有填写评论!'):
+            numberOfReviewsWithContent += 1
 
+        if (reviewDate[item] != reviewDate[item + 1] or item + 2 == len(reviewDate)):
+            #print(numberOfReviewsWithoutContent)
+            #print(numberOfReviewsWithContent)
+            numberOfReviewsWithoutContentOnSameDate.append(numberOfReviewsWithoutContent)
+            numberOfReviewsWithContentOnSameDate.append(numberOfReviewsWithContent)
+            dateWithReviews.append(reviewDate[item])
+            numberOfReviewsWithoutContent = 0
+            numberOfReviewsWithContent = 0
+        item += 1
+
+    numberOfReviewsPerDate = list(zip(dateWithReviews, numberOfReviewsOnSameDate))
+    #numberOfReviewsWithoutContentPerDate = list(zip(dateWithReviews, numberOfReviewsWithoutContentOnSameDate))
+    #numberOfReviewsWithContentPerDate = list(zip(dateWithReviews, numberOfReviewsWithContentOnSameDate))
+    #print(numberOfReviewsWithoutContentPerDate)
+    #print(numberOfReviewsWithContentPerDate)
+    #print(numberOfReviewsPerDate)
+    df_date = pd.DataFrame(data = numberOfReviewsPerDate, columns = ['Date', 'NumberOfReviews'])
+    df_date.insert(2 ,'NumberOfReviewsWithContent', numberOfReviewsWithContentOnSameDate)
+    df_date.insert(3 ,'NumberOfReviewsWithoutContent', numberOfReviewsWithoutContentOnSameDate)
+    print(df_date)
+    df_date.to_csv(outPath, index=False, header=False, encoding= 'utf-8')
+'''
     df_date.time = pd.to_datetime(df_date['Date'], format = '%Y-%m-%d')
     df_date.set_index(['Date'], inplace = True)
     df_date.plot()
     #print(df_date)
-    df_date.to_csv(outPath, index = False, header = False)
     wordCut = thulac.thulac()
     #加入进度条显示功能，之后可能会删去
 
@@ -157,7 +184,7 @@ def dataAnalysis(inPath, outPath):
     print("正面评价数：开发中...")
     print("负面评价数：开发中...")
     print(noEmotionReview)
-
+'''
 reviewUser = []
 reviewContent = []
 
